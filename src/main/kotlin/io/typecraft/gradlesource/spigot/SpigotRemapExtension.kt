@@ -38,6 +38,28 @@ abstract class SpigotRemapExtension {
      */
     abstract val spigotVersion: Property<String>
 
+    /**
+     * Configures the classifier for the obfuscated jar. Optional. Defaults to "obf"
+     * 
+     * Example:
+     * 
+     * ```kotlin
+     * obfJarClassifier.set("obfuscated")
+     * ```
+     */
+    abstract val obfJarClassifier: Property<String>
+
+    /**
+     * Configures the classifier for the spigot-mapped jar. Optional. Defaults to "spigot"
+     *
+     * Example:
+     *
+     * ```kotlin
+     * spigotJarClassifier.set("") // This would replace the original jar
+     * ```
+     */
+    abstract val spigotJarClassifier: Property<String>
+
     val spigotVersionExact: Provider<String> = spigotVersion.map { ver ->
         val pieces = ver.split("-")
         val r = pieces.getOrNull(1) ?: "R0.1"

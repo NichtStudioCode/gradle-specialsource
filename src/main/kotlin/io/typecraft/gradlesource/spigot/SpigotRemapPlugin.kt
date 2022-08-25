@@ -45,7 +45,7 @@ class SpigotRemapPlugin : Plugin<Project> {
             })
             outJarFile.set(spigotRemapExt.sourceJarTask.flatMap { jarTask ->
                 jarTask.destinationDirectory.map { dir ->
-                    val archiveName = archiveNameFromTask(jarTask).copy(classifier = "obf")
+                    val archiveName = archiveNameFromTask(jarTask).copy(classifier = spigotRemapExt.obfJarClassifier.getOrElse("obf"))
                     dir.file(archiveName.toFileName())
                 }
             })
@@ -64,7 +64,7 @@ class SpigotRemapPlugin : Plugin<Project> {
             })
             outJarFile.set(spigotRemapExt.sourceJarTask.flatMap { jarTask ->
                 jarTask.destinationDirectory.map { dir ->
-                    val archiveName = archiveNameFromTask(jarTask).copy(classifier = "spigot")
+                    val archiveName = archiveNameFromTask(jarTask).copy(classifier = spigotRemapExt.spigotJarClassifier.getOrElse("spigot"))
                     dir.file(archiveName.toFileName())
                 }
             })
