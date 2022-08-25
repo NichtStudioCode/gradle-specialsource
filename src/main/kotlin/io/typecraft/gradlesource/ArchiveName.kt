@@ -12,8 +12,7 @@ data class ArchiveName(
             baseName,
             appendix,
             version,
-            classifier,
-            extension
+            classifier
         ).filter {
             it.isNotEmpty()
         }.joinToString("-") + if (extension.isNotEmpty()) {
