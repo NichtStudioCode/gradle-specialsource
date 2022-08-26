@@ -3,12 +3,11 @@ package io.typecraft.gradlesource
 import net.md_5.specialsource.Jar
 import net.md_5.specialsource.JarMapping
 import net.md_5.specialsource.JarRemapper
+import net.md_5.specialsource.provider.JarProvider
+import net.md_5.specialsource.provider.JointProvider
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 
 /**
@@ -37,6 +36,7 @@ abstract class RemapTask : DefaultTask() {
      */
     @get:OutputFile
     abstract val outJarFile: RegularFileProperty
+
     /**
      * Input a mapping file as `RegularFile`. Mandatory.
      *
@@ -45,7 +45,7 @@ abstract class RemapTask : DefaultTask() {
      * ```-srg-in ${mappingFile}```
      */
     @get:InputFile
-    abstract val mappingFile: RegularFileProperty
+    abstract val srgIn: RegularFileProperty
 
     /**
      * Input whether reverse or not. Defaults to `false`.
@@ -60,13 +60,27 @@ abstract class RemapTask : DefaultTask() {
 
     @TaskAction
     fun remap() {
-        val mapping = JarMapping()
         val rev = reverse.getOrElse(false)
-        val mappingPath = mappingFile.asFile.get().absolutePath
-        mapping.loadMappings(mappingPath, rev, false, null, null)
-        val jarMap = JarRemapper(null, mapping, null)
-        Jar.init(inJarFile.asFile.get()).use { jar ->
-            jarMap.remapJar(jar, outJarFile.get().asFile)
+        val inFile = inJarFile.get().asFile
+        val outFile = outJarFile.get().asFile
+
+        val mapping = JarMapping()
+        val inheritanceProviders = JointProvider().also(mapping::setFallbackInheritanceProvider)
+
+        // load mapping file
+        mapping.loadMappings(srgIn.get().asFile.absolutePath, rev, false, null, null)
+        
+        // inheritance provider
+        val inJar = Jar.init(inFile)
+        inheritanceProviders.add(JarProvider(inJar))
+
+        // load all project dependencies as inheritance providers
+        project.configurations.getByName("compileClasspath").incoming.artifacts.artifactFiles.files.forEach {
+            inheritanceProviders.add(JarProvider(Jar.init(it)))
         }
+
+        // remap jar
+        val jarMap = JarRemapper(null, mapping, null)
+        jarMap.remapJar(inJar, outFile)
     }
 }
