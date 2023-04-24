@@ -1,7 +1,5 @@
-package io.typecraft.gradlesource.spigot
+package io.typecraft.gradlesource
 
-import io.typecraft.gradlesource.ArchiveName
-import io.typecraft.gradlesource.RemapTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -26,7 +24,7 @@ import org.gradle.kotlin.dsl.register
  *
  * @since 1.0
  */
-class SpigotRemapPlugin : Plugin<Project> {
+class SpecialSourceGradlePlugin : Plugin<Project> {
     override fun apply(p: Project) {
         p.pluginManager.apply(JavaPlugin::class)
         p.repositories.mavenLocal {
@@ -64,7 +62,7 @@ class SpigotRemapPlugin : Plugin<Project> {
             outJarFile.set(spigotRemapExt.sourceJarTask.flatMap { jarTask ->
                 jarTask.destinationDirectory.map { dir ->
                     val archiveName =
-                        archiveNameFromTask(jarTask).copy(classifier = spigotRemapExt.spigotJarClassifier.getOrElse("spigot"))
+                        archiveNameFromTask(jarTask).copy(classifier = spigotRemapExt.spigotJarClassifier.getOrElse(""))
                     dir.file(archiveName.toFileName())
                 }
             })

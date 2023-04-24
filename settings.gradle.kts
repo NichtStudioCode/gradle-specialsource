@@ -1,2 +1,2 @@
-rootProject.name = "gradle-specialsource"
+rootProject.name = "specialsource-gradle-plugin"
 
