@@ -1,5 +1,5 @@
 group = "xyz.xenondevs"
-version = "1.1"
+version = "1.2"
 
 plugins {
     kotlin("jvm") version "1.8.20"
