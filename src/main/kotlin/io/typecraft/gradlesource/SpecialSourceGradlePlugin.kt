@@ -2,38 +2,25 @@ package io.typecraft.gradlesource
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 
 /**
  * Plugin for remap mojang to spigot for distribution.
  *
- * This plugin will applies:
+ * This plugin applies:
  * - Extensions:
  *    - `spigotRemap` [SpigotRemapExtension]
  * - Tasks:
  *    - `remapMojangToObf` [RemapTask]: remap your jar(mojang mapping) to obfuscated.
  *    - `remapObfToSpigot` [RemapTask]: remap the obfuscated jar to spigot(for distribution). Depends on `remapMojangToObf` and `assemble`.
- * - Plugins:
- *    - `java` - [JavaPlugin][org.gradle.api.plugins.JavaPlugin]
- * - Repositories:
- *    - `mavenLocal()`
  *
  * @since 1.0
  */
 class SpecialSourceGradlePlugin : Plugin<Project> {
-    override fun apply(p: Project) {
-        p.pluginManager.apply(JavaPlugin::class)
-        p.repositories.mavenLocal {
-            metadataSources {
-                mavenPom() // To resolve `maven-metadata-local.xml`
-                artifact()
-            }
-        }
 
+    override fun apply(p: Project) {
         val spigotRemapExt = p.extensions.create<SpigotRemapExtension>("spigotRemap")
         val remapMojangToObf = p.tasks.register<RemapTask>("remapMojangToObf")
         val remapObfToSpigot = p.tasks.register<RemapTask>("remapObfToSpigot")
@@ -77,6 +64,7 @@ class SpecialSourceGradlePlugin : Plugin<Project> {
         val assemble = p.tasks.getByName("assemble")
         assemble.dependsOn(remapObfToSpigot)
     }
+    
 }
 
 private fun archiveNameFromTask(x: AbstractArchiveTask): ArchiveName =
